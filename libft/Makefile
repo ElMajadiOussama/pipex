@@ -1,3 +1,4 @@
+
 #-------------------------------------------------------------------COLORS---------------------------------------------------------------------------------------------
 
 # Reset
@@ -65,60 +66,54 @@ On_IWhite='\033[0;107m'   # White
 
 # --------------------------------------------------------------------VARS ---------------------------------------------------------------------------------------------
 
-NAME			= pipex                 												# name of the programm
+NAME			= libft.a                    										# name of the programm
 
-CC				= gcc -g                        											# compiler
+CC				= gcc                        										# compiler
 
-FLAGS			= -Wall -Wextra -Werror   												# flags
+FLAGS			= -Wall -Wextra -Werror      										# flags
 
-RM				= rm -f           														# remove 
-						
+RM				= rm -f                      										# remove 
+
+LIBC 			= ar rcs					 										# creates library archive
+
 # -----------------------------------------------------------------SOURCE FILES ----------------------------------------------------------------------------------------
 
-SRCS			= 	src/process.c\
-					src/pipex.c
+SOURCES			= 	ft_putstr_fd.c \
+                	ft_split.c \
+                	ft_strjoin.c \
+					ft_strlen.c \
+					ft_strncmp.c \
+					ft_strnstr.c \
+					ft_substr.c \
+			
 
-OBJS	   		 = $(SRCS:.c=.o)       	 												# trasnforms all the ".c" files into ".o" (objects)
-
-HEADER			 = -Iincludes -I./libft.h 												# adds headers
-
-LIBFT 			 = make -C libft/														# compiling Libft
-
-NORM 			 =  @norminette 														# checking the norm
+OBJS	   		 = $(SOURCES:.c=.o)       	 										# trasnforms all the ".c" files into ".o" (objects)
 
 # -------------------------------------------------------------------- RULES -------------------------------------------------------------------------------------------
 
 .c.o:		
-			@$(CC) $(FLAGS) $(HEADER) -c $< -o $(<:.c=.o)
+			@$(CC) $(FLAGS) -c -I. $< -o $(<:.c=.o)
 
-all:	    $(NAME)   																	# will execute NAME rule
 		
-$(NAME):	$(OBJS)
-			$(NORM) 
-			@echo $(BGreen)√$(Color_Off)$(BBlue)Norm is OK!$(Color_Off);
-			@$(LIBFT)
-			@touch infile
-			@echo $(BGreen)√$(Color_Off)$(BBlue)Infile Has Beed Created!$(Color_Off);
-			 @$(CC) $(OBJS) ./libft/libft.a -o $(NAME)
-			@echo $(BGreen)√$(Color_Off)$(BBlue)Pipex Has Been Compiled!$(Color_Off);
-			@echo $(BBlue)To Use Pipex :$(BGreen)$(UGreen)./pipex infile \"command_1\" \"command_2\" outfile$(Color_Off);
+$(NAME):	$(OBJS)                                                                      
+			@$(LIBC) $(NAME) $(OBJS)
+			@echo $(BGreen)√$(Color_Off)$(BBlue)Libft Has Been Compiled!$(Color_Off);
 
-clean: 																					# remove all .o
-			@$(RM) $(OBJS) libft/*.o infile outfile
-			@echo $(BGreen)√$(Color_Off)$(BBlue)Clean Succeeded, All The '.o' Has Been Removed!$(Color_Off);
+all:	    $(NAME)
+
+   																# will execute NAME rule
+clean: 																				# remove all .o
+			$(RM) $(OBJS) 
+			@echo "...clean succeeded, all the '.o' has been removed!"
 														         
-fclean: clean                            												# force remove NAME
-			@$(RM) $(NAME) libft/*.o libft/*.a infile outfile
-			@echo $(BGreen)√$(Color_Off)$(BBlue)Fclean Succeeded, Everything Has Been Removed!$(Color_Off);
+fclean: clean                            											# force remove NAME
+			$(RM) $(NAME)
+			@echo "...fclean succeeded, 'libft.a' has been removed!"
 
 
-re: fclean all 																			# rule to recompile MAKEFILE (will remove everything and allows to recompile again)
-			@echo $(BGreen)√$(Color_Off)$(BBlue)Recompile Succeeded!$(Color_Off);	
-
-leaks:		${NAME}																		# adds valgrind to check system leaks
-			valgrind --leak-check=full ./$(NAME)
-			@echo $(BBlue)No Leaks Detected$(Color_Off);
+re: fclean all																		# rule to recompile MAKEFILE (will remove everything and allows to recompile again)
+			@echo "...recompile succeeded!"		
 
 # ----------------------------------------------------------------------PHONY --------------------------------------------------------------------------------------------
 
-.PHONY: all clean fclean leaks re             											# in phony section we need to include all used rules
+.PHONY: all clean fclean re             											# in phony section we need to include all used rules
