@@ -1,5 +1,5 @@
 #include "../includes/pipex.h"
-int main(int argc, char *argv[], char **envp, int fd)
+int main(int argc, char *argv[], char **envp)
 {
     int fd[2];
     pid_t   process_id;
@@ -12,7 +12,7 @@ int main(int argc, char *argv[], char **envp, int fd)
         }
         process_id = fork();// Création d'un nouveau processus
         if(process_id ==-1)
-            error("fork");
+            perror("fork");
         if(process_id == 0)
             child_process(argv, envp, fd);
         waitpid(process_id, NULL, 0);

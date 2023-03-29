@@ -29,5 +29,5 @@
 ** libft.h
 */
 # include "../libft/libft.h"
-
+void    child_process(char **argv, char **envp, int *fd);
 #endif
