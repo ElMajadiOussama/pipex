@@ -7,7 +7,6 @@ void	errors(char *error)
 	exit(EXIT_FAILURE);
 }
 
-
 char    *find_path(char *cmd, char **env)
 {
     char **all_path;
@@ -18,11 +17,11 @@ char    *find_path(char *cmd, char **env)
     i = 0;
     while(ft_strnstr(env[i], "PATH=", 5) == 0)
         env++;
-    all_path[i] = ft_split(env, ":");
+    all_path = ft_split(env[i], ':');
     while(all_path[i])
     {
-        join_path[i] = ft_strjoin(all_path[i], "/");
-        path = ft_strjoin(join_path[i], cmd);
+        join_path = ft_strjoin(all_path[i], "/");
+        path = ft_strjoin(join_path, cmd);
         free(join_path);
         if(access(path, F_OK) == 0)
             return(path);
@@ -40,11 +39,24 @@ void    child_process(char **argv, char **env,int *fd)
 {
     int infile;
 
-    infile = open(fd[0], O_RDONLY, 0777);
+    infile = open(argv[1], O_RDONLY, 0777);
     if(infile == -1)
-        return (NULL);
-    dup2(fd[0], STDOUT_FILENO);
+        errors("Error");
+    dup2(fd[1], STDOUT_FILENO);
     dup2(infile, STDIN_FILENO);
     close(fd[0]);
     exec(argv[2], env);
+}
+
+void    parent_process(char **argv, char **env, int *fd)
+{
+    int outfile;
+
+    outfile = open(argv[4],  O_WRONLY | O_CREAT | O_TRUNC, 0777);
+    if (outfile == -1)
+        errors("Error");
+    dup2(fd[0], STDIN_FILENO);
+    dup2(outfile, STDOUT_FILENO);
+    close(fd[1]);
+    exec(argv[3], env);
 }

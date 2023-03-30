@@ -32,6 +32,6 @@
 void    child_process(char **argv, char **envp, int *fd);
 void    parent_process(char **argv, char **envp, int *fd);
 void	errors(char *error);
-char *find_path(char *command, char **envp);
-void	execute(char *argv, char **envp);
+char    *find_path(char *cmd, char **envp);
+void	exec(char *argv, char **envp);
 #endif
