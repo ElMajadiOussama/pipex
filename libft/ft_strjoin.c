@@ -1,4 +1,5 @@
 #include "libft.h"
+#include<stdio.h>
 
 char	*ft_strjoin(char const *s1, char const *s2)
 {
@@ -20,6 +21,8 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	}
 	while (s2[j])
 	{
+		printf("\n%c\n", str[i]);
+		// write(1, str[i], 1);
 		str[i] = s2[j];
 		i++;
 		j++;
