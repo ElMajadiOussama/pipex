@@ -7,6 +7,27 @@ void	errors(char *error)
 	exit(EXIT_FAILURE);
 }
 
+void    exec(char *argv, char **env)
+{
+    char *path;
+    char **cmd;
+    int i;
+
+    i = -1;
+
+    cmd = ft_split(argv, ' ');
+    path = find_path(cmd[0], env);
+    if(!path)
+    {
+        while(cmd[++i])
+            free(cmd[i]);
+        free(cmd);
+        errors("Wrong command");
+    }
+    if(execve(path, cmd, env) == -1)
+        errors("Error");
+}
+
 char    *find_path(char *cmd, char **env)
 {
     char **all_path;
