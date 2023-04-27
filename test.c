@@ -1,50 +1,70 @@
-#include "libft/libft.h"
+#include <unistd.h>
+#include <sys/wait.h>
+#include <stdlib.h>
+#include <signal.h>
 #include <stdio.h>
-char	*ft_strnstr(const char *haystack, const char *needle, size_t len)
-{
-	size_t	needle_len;
 
-	if (!*needle || haystack == needle)
-		return ((char *)haystack);
-	needle_len = ft_strlen(needle);
-	while (*haystack && needle_len <= len)
-	{
-		if (!(ft_strncmp((char *)haystack, (char *)needle, needle_len)))
-			return ((char *)haystack);
-		haystack++;
-		len--;
-	}
-	return (NULL);
-}
-size_t	ft_strlen(const char *str)
-{
-	size_t	i;
 
-	i = 0;
-	while (str[i])
-		i++;
-	return (i);
-}
-int	ft_strncmp(const char *s1, const char *s2, size_t n)
+// Routine du processus fils :
+void    routine_fils(void)
 {
-	size_t	i;
-
-	i = 0;
-	if (n > 0)
-	{
-		while ((s1[i] || s2[i]) && (s1[i] == s2[i]) && i < n - 1)
-			i++;
-		return (((unsigned char *)s1)[i] - ((unsigned char *)s2)[i]);
-	}
-	return (0);
+    printf("\e[36mFils : Coucou! Je suis un fils. Je tourne a l'infini.\e[0m\n");
+    while (1) // Tourne a l'infini
+        continue;
 }
 
-int main(int argc, char **envp)
+// Routine du processus pere :
+void    kill_and_get_children(pid_t *pid)
 {
-    int i = 0;
-    while(ft_strncmp(envp[i], "PATH", 4))
+    int	status;
+    int	i;
+
+    printf("Pere : Je suis le pere filicide.\n");
+    i = 0;
+    while (i < 3) // Tue les 3 fils avec un signal
     {
-        printf("%s", envp[i]);
+        kill(pid[i], SIGKILL);
         i++;
     }
+    printf("Pere : J'ai tue tous mes fils mwahahaaa !\n");
+    i = 0;
+    while (i < 3) // Récupère la sortie de chaque fils
+    {
+        waitpid(pid[i], &status, 0);
+        if (WIFEXITED(status))
+            printf("Fils [%d] a terminé normalement.\n", pid[i]);
+        else if (WIFSIGNALED(status))
+        {
+            printf("Fils [%d] a ete interrompu.\n", pid[i]);
+            if (WTERMSIG(status) == SIGTERM)
+                printf("\e[31mFils [%d] a recu le signal %d, SIGTERM\e[0m\n",
+                            pid[i], WTERMSIG(status));
+            if (WTERMSIG(status) == SIGKILL)
+                printf("\e[31mFils [%d] a recu le signal %d, SIGKILL\e[0m\n",
+                            pid[i], WTERMSIG(status));
+        }
+        i++;
+    }
+}
+
+int    main(void)
+{
+    pid_t    pid[3]; // Stocke les retours de fork
+    int      i;
+
+    i = 0;
+    while (i < 3) // Crée 3 fils
+    {
+        pid[i] = fork(); // Création d'un processus fils
+        if (pid[i] == -1)
+            return (EXIT_FAILURE);
+        else if (pid[i] == 0)
+            routine_fils();
+        else if (pid[i] > 0)
+            printf("Fils #%d cree avec pid = %d\n", i, pid[i]);
+        usleep(1000000); // Décaler les fils un peu dans le temps
+        i++;
+    }
+    kill_and_get_children(pid);
+    return (EXIT_SUCCESS);
 }

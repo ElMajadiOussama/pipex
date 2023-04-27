@@ -63,8 +63,8 @@ void    child_process(char **argv, char **env,int *fd)
     infile = open(argv[1], O_RDONLY, 0777);
     if(infile == -1)
         errors("Error");
-    dup2(fd[1], STDOUT_FILENO);
     dup2(infile, STDIN_FILENO);
+    dup2(fd[1], STDOUT_FILENO);
     close(fd[0]);
     exec(argv[2], env);
 }
@@ -76,7 +76,7 @@ void    parent_process(char **argv, char **env, int *fd)
     outfile = open(argv[4],  O_WRONLY | O_CREAT | O_TRUNC, 0777);
     if (outfile == -1)
         errors("Error");
-    dup2(fd[0], STDIN_FILENO);
+    dup2(fd[0], STDOUT_FILENO);
     dup2(outfile, STDOUT_FILENO);
     close(fd[1]);
     exec(argv[3], env);
